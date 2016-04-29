@@ -106,6 +106,20 @@ void key_press(int key, int x, int y)
     return;
 }
 
+static void update_viewport()
+{
+    viewport[2] /= 2;
+    viewport[2] *= 2;
+    viewport[3] /= 2;
+    viewport[3] *= 2;
+
+#define min(a, b)  (((a) < (b)) ? (a) : (b))
+#define max(a, b)  (((a) > (b)) ? (a) : (b))
+    viewport[2] = min(max(viewport[2], 2), 2048);
+    viewport[3] = min(max(viewport[3], 2), 2048);
+    reshape(viewport[2], viewport[3]);
+}
+
 void key_press_ascii(unsigned char key, int x, int y)
 {
     GLenum error;
@@ -127,10 +141,34 @@ void key_press_ascii(unsigned char key, int x, int y)
             channels[CVG] = GL_FALSE; /* by default, no alpha rendering */
         break;
     case '-':
-        reshape(viewport[2] -= 1, viewport[3]);
+        viewport[2] -= 2;
+        update_viewport();
         break;
+    case '=':
     case '+':
-        reshape(viewport[2] += 1, viewport[3]);
+        viewport[2] += 2;
+        update_viewport();
+        break;
+    case '[':
+        viewport[2] /= 2;
+        update_viewport();
+        break;
+    case ']':
+        viewport[2] *= 2;
+        update_viewport();
+        break;
+    case '{':
+        viewport[3] /= 2;
+        update_viewport();
+        break;
+    case '}':
+        viewport[3] *= 2;
+        update_viewport();
+        break;
+    case '.':
+        viewport[2] = 256;
+        viewport[3] = 256;
+        reshape(viewport[2], viewport[3]);
         break;
     case 'A':
         glDisable(GL_BLEND);
